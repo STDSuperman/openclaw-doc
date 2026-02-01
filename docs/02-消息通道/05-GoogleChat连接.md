@@ -17,9 +17,6 @@ last_updated: "2026-02-01"
 source: "docs/channels/googlechat.md"
 ---
 
-<ai-only>
-**摘要**: 本文档介绍如何在 OpenClaw 中配置 Google Chat 通道，包括服务账号创建、应用配置、webhook 设置、远程访问、DM/群组访问控制和故障排查。
-</ai-only>
 
 # Google Chat 连接配置（Chat API）
 

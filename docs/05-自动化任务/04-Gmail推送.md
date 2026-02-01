@@ -11,9 +11,6 @@ last_updated: "2026-01-01"
 source: "docs/automation/gmail-pubsub.md"
 ---
 
-<ai-only>
-**摘要**: Gmail Pub/Sub 推送到 OpenClaw webhook,通过 gogcli 实现,提供实时邮件通知和自动处理,需要配置 GCP 项目、Gmail API 和 Tailscale 隧道。
-</ai-only>
 
 # Gmail 推送
 

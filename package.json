@@ -5,10 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vitepress dev docs",
-    "build": "vitepress build docs",
+    "build": "vitepress build docs && npx pagefind --site docs/.vitepress/dist --output-subdir pagefind",
     "preview": "vitepress preview docs"
   },
   "devDependencies": {
+    "@sugarat/theme": "^0.5.14",
+    "pagefind": "^1.4.0",
+    "sass-embedded": "^1.97.3",
     "vitepress": "^1.0.0",
     "vitepress-plugin-llms": "^1.0.0"
   }

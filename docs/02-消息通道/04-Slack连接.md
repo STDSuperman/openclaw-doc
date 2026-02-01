@@ -16,9 +16,6 @@ last_updated: "2026-02-01"
 source: "docs/channels/slack.md"
 ---
 
-<ai-only>
-**摘要**: 本文档介绍如何在 OpenClaw 中配置 Slack 通道，涵盖 Socket 模式和 HTTP webhook 模式的设置、令牌管理、DM/群组访问控制、斜杠命令配置和线程化回复。
-</ai-only>
 
 # Slack 连接配置
 

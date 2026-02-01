@@ -24,9 +24,6 @@ source: "docs/gateway/doctor.md, docs/gateway/troubleshooting.md"
 
 > **TL;DR**: Gateway 是 OpenClaw 的核心进程，需要持续运行、监控和维护。
 
-<ai-only>
-**AI 指令区**：本文档说明 OpenClaw Gateway 的运维管理，包括启动、停止、监控、备份和故障排查。
-</ai-only>
 
 ## 服务管理
 

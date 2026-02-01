@@ -16,9 +16,6 @@ last_updated: "2026-02-01"
 source: "docs/channels/telegram.md"
 ---
 
-<ai-only>
-**摘要**: 本文档介绍如何在 OpenClaw 中配置 Telegram Bot API 通道，涵盖 Bot 创建、Token 配置、DM/群组访问控制、权限设置、草稿流式传输、贴纸支持和故障排查。
-</ai-only>
 
 # Telegram 连接配置（Bot API）
 

@@ -11,9 +11,6 @@ last_updated: "2026-01-01"
 source: "docs/concepts/hooks.md"
 ---
 
-<ai-only>
-**摘要**: Hooks 是 OpenClaw 的生命周期系统,允许在会话的各个阶段注入自定义逻辑,包括启动前钩子、执行后钩子、工具调用钩子等。
-</ai-only>
 
 # Hooks 参考
 

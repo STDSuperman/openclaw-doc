@@ -11,9 +11,6 @@ last_updated: "2026-01-01"
 source: "docs/platforms/linux.md"
 ---
 
-<ai-only>
-**摘要**: Linux 是 Gateway 的主要运行时平台,支持 systemd 用户服务,Node 作为推荐运行时,提供完整的应用和 Gateway 支持。
-</ai-only>
 
 # Linux 平台指南
 

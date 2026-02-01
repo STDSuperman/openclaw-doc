@@ -11,9 +11,6 @@ last_updated: "2026-01-01"
 source: "docs/platforms/macos.md"
 ---
 
-<ai-only>
-**摘要**: OpenClaw macOS 伴侣应用是菜单栏应用,管理 Gateway 连接、TCC 权限和 macOS 特定工具(Canvas、相机、系统运行等),支持本地和远程 Gateway 模式。
-</ai-only>
 
 # macOS 平台指南
 

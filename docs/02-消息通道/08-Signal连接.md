@@ -18,9 +18,6 @@ last_updated: "2026-02-01"
 source: "docs/channels/signal.md"
 ---
 
-<ai-only>
-**摘要**: 本文档介绍如何在 OpenClaw 中配置 Signal 通道，包括 signal-cli 设置、多账号支持、外部守护进程模式、DM/群组访问控制、反应支持和故障排查。
-</ai-only>
 
 # Signal 连接配置（signal-cli）
 

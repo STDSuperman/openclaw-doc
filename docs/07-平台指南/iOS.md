@@ -11,9 +11,6 @@ last_updated: "2026-01-01"
 source: "docs/platforms/ios.md"
 ---
 
-<ai-only>
-**摘要**: iOS 节点应用连接到 Gateway over WebSocket,公开 Canvas、屏幕快照、相机捕获、位置、Talk 模式和语音唤醒,支持通过本地网络或 Tailnet 发现。
-</ai-only>
 
 # iOS 节点(Node 应用)
 

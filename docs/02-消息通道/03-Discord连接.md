@@ -17,9 +17,6 @@ last_updated: "2026-02-01"
 source: "docs/channels/discord.md"
 ---
 
-<ai-only>
-**摘要**: 本文档详细介绍如何在 OpenClaw 中配置 Discord Bot，包括应用创建、Gateway Intents 配置、权限设置、DM/群组访问控制、斜杠命令和故障排查。
-</ai-only>
 
 # Discord 连接配置（Bot API）
 

@@ -11,9 +11,6 @@ last_updated: "2026-01-01"
 source: "docs/automation/webhook.md"
 ---
 
-<ai-only>
-**摘要**: Gateway 可以暴露一个小型 HTTP webhook 端点,用于外部系统触发器,支持唤醒主会话或运行隔离的 agent 回合,并可配置自定义映射和模板。
-</ai-only>
 
 # Webhooks
 

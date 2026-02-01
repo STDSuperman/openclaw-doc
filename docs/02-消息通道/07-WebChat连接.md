@@ -16,9 +16,6 @@ last_updated: "2026-02-01"
 source: "docs/web/webchat.md"
 ---
 
-<ai-only>
-**摘要**: 本文档介绍 WebChat 通道，它是 macOS/iOS SwiftUI 聊天 UI，直接与 Gateway WebSocket 通信，提供与其它通道相同的会话和路由规则。
-</ai-only>
 
 # WebChat（Gateway WebSocket UI）
 

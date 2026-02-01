@@ -18,9 +18,6 @@ last_updated: "2026-02-01"
 
 > **TL;DR**: Gateway 是 OpenClaw 的**核心控制平面**，通过 WebSocket 为所有客户端提供统一接口。
 
-<ai-only>
-**AI 指令区**：本文档详细说明 Gateway 的工作原理、配置选项和运维方法，供 AI 理解和协助用户配置。
-</ai-only>
 
 ---
 

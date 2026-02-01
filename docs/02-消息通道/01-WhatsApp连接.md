@@ -16,9 +16,6 @@ last_updated: "2026-02-01"
 source: "docs/channels/whatsapp.md"
 ---
 
-<ai-only>
-**摘要**: 本文档介绍如何在 OpenClaw 中配置 WhatsApp（网页版）通道，包括账号管理、DM 访问控制、群组配置、媒体限制和故障排查。
-</ai-only>
 
 # WhatsApp 连接配置
 

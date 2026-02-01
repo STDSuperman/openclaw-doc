@@ -17,9 +17,6 @@ last_updated: "2026-02-01"
 source: "docs/channels/imessage.md"
 ---
 
-<ai-only>
-**摘要**: 本文档介绍如何在 OpenClaw 中配置 iMessage 通道，包括 imsg CLI 工具设置、远程/SSH 变体、DM/群组访问控制、媒体限制和故障排查。
-</ai-only>
 
 # iMessage 连接配置（imsg）
 

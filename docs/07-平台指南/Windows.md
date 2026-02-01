@@ -11,9 +11,6 @@ last_updated: "2026-01-01"
 source: "docs/platforms/windows.md"
 ---
 
-<ai-only>
-**摘要**: OpenClaw 在 Windows 上通过 WSL2(推荐)或原生安装运行,Gateway 运行在 WSL 内部,CLI 通过 npm/pnpm 全局安装,支持端口代理以从外部访问 WSL 服务。
-</ai-only>
 
 # Windows 平台指南(WSL2)
 
