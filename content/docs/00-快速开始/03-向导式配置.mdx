@@ -1,0 +1,381 @@
+---
+title: "向导式配置"
+category: "快速开始"
+difficulty: "入门"
+estimated_time: "15分钟阅读"
+tags:
+  - 配置
+  - 向导
+  - CLI
+  - 自动化
+prerequisites:
+  - "[已完成安装](./02-5分钟安装指南.md)"
+  - "[了解 OpenClaw](./01-什么是OpenClaw.md)"
+related_docs:
+  - ["首次连接", "配置与运维/00-配置文件说明"]
+next_steps:
+  - ["首次连接"]
+last_updated: "2026-02-01"
+source: "docs/start/wizard.md, docs/start/onboarding.md"
+---
+
+
+# 向导式配置
+
+> **TL;DR**: 10-15 分钟内完成 OpenClaw 初始化，无需手动编辑配置文件。
+
+**关键要点**：
+- ✅ CLI 命令：`openclaw onboard --install-daemon`
+- ✅ 自动检测：智能识别系统环境
+- ✅ 分步引导：每个步骤都有说明和验证
+- ✅ 安全默认值：启用配对、设置沙盒、选择模型
+
+---
+
+<ai-search-key>
+向导, 配置, 引导, onboarding, 快速开始
+</ai-search-key>
+
+## 运行向导
+
+### 标准命令
+
+```bash
+openclaw onboard --install-daemon
+```
+
+### 命令选项
+
+| 选项 | 说明 | 默认值 |
+|------|------|---------|
+| `--mode` | 运行模式 | 自动检测 |
+| `--install-daemon` | 安装后台服务 | `true`（推荐） |
+| `--non-interactive` | 跳过提示，使用默认值 | `false` |
+| `--reset` | 重置所有配置 | `false` |
+| `--workspace` | 工作空间路径 | `~/.openclaw/workspace` |
+| `--gateway-port` | Gateway 端口 | `18789` |
+| `--gateway-bind` | Gateway 绑定地址 | `loopback` |
+| `--auth-choice` | 认证方式 | 自动检测 |
+
+**提示**：首次运行强烈推荐使用 `--install-daemon` 安装后台服务。
+
+---
+
+## 向导流程详解
+
+### 第一步：欢迎与选择运行模式
+
+向导会自动检测你的环境：
+
+#### 环境检测
+
+| 组件 | 检测内容 | 说明 |
+|------|----------|------|
+| **Node.js** | 版本 >= 22 | ✅ 要求满足 |
+| **操作系统** | macOS / Linux / Windows (WSL2) | ✅ 自动识别 |
+| **全局 CLI** | `openclaw` 可用 | ✅ 准备就绪 |
+| **现有配置** | `~/.openclaw/openclaw.json` | ⣠️ 可保留或重置 |
+
+#### 运行模式选择
+
+**Local 模式（默认）**：
+- Gateway 在本地运行
+- 客户端连接到 `127.0.0.1:18789`
+- 适合：首次安装、个人使用、测试环境
+
+**Remote 模式**：
+- Gateway 运行在远程服务器
+- 本地客户端通过 SSH/Tailscale 连接
+- 适合：服务器部署、多设备访问
+
+---
+
+### 第二步：认证配置
+
+
+#### 环境变量方式
+
+```bash
+# 设置 Anthropic API Key
+export ANTHROPIC_API_KEY="sk-ant-xxx"
+
+# 设置 OpenAI API Key
+export OPENAI_API_KEY="sk-proj-xxx"
+```
+
+#### 手动输入方式
+
+向导运行时会提示输入：
+
+```
+请选择模型提供商（anthropic/openai）：
+请输入 API Key（留空跳过）：
+```
+
+**认证凭证存储位置**：
+- API Keys：加密存储在 `~/.openclaw/.env`
+- OAuth 凭证：`~/.openclaw/credentials/oauth.json`
+
+---
+
+### 第三步：Gateway 配置
+
+
+#### 配置文件示例
+
+向导完成后的配置文件示例：
+
+```json5
+{
+  // ========== 基础配置 ==========
+  gateway: {
+      port: 18789,
+      bind: "loopback",
+      auth: {
+        token: "自动生成的安全令牌"
+      },
+      tailscale: {
+        mode: "off"
+      }
+  },
+  
+  // ========== 安全配置 ==========
+  agents: {
+      defaults: {
+        sandbox: {
+          mode: "non-main"
+        }
+      }
+  },
+  
+  // ========== 默认模型 ==========
+  models: {
+      providers: {
+        anthropic: {
+          apiKey: "环境变量 ANTHROPIC_API_KEY"
+        }
+      }
+  }
+}
+```
+
+---
+
+### 第四步：消息通道配置
+
+
+#### 通道配置示例
+
+```json5
+{
+  // ========== 消息通道 ==========
+  channels: {
+      whatsapp: {
+        // 向导会设置登录，此处仅为示例
+        // allowFrom: ["+86138000000"]  // 允许的号码
+        // groups: { "*": { "requireMention": true } }  // 群组默认需要@提及
+      },
+      
+      telegram: {
+        botToken: "环境变量 TELEGRAM_BOT_TOKEN",
+        allowFrom: [],  // 默认空（所有用户）
+        groups: {
+          "*": {
+            "requireMention": true  // 群组需要@提及
+          }
+        }
+      }
+  }
+}
+```
+
+---
+
+### 第五步：工作空间初始化
+
+
+#### 推荐默认 AGENTS.md
+
+向导创建的默认 AGENTS.md 示例：
+
+```markdown
+# OpenClaw Agent 配置
+
+你是 OpenClaw - 个人 AI 助手。
+
+## 核心职责
+
+1. 回答用户问题和提供帮助
+2. 执行任务和调用工具
+3. 维持对话上下文，记住重要信息
+4. 提供准确、有用的信息
+5. 在不确定时诚实说明，避免编造
+
+## 行为准则
+
+1. **回答风格**：简洁、直接、有礼貌
+2. **语言**：使用用户的语言（优先检测）
+3. **上下文**：利用对话历史，记住之前的讨论
+4. **工具使用**：谨慎调用工具，仅在必要时执行
+5. **安全性**：不执行危险操作，不泄露敏感信息
+
+## 工具权限
+
+你有权访问以下工具：
+- 消息发送和接收
+- 文件读写和编辑
+- 命令执行
+- 浏览器控制（如果启用）
+- 节点功能（如果连接）
+- 会话管理
+
+## 自定义
+
+你可以在 `IDENTITY.md` 和 `USER.md` 中自定义：
+- AI 的名字和个性
+- 偏好的回答风格（简洁/详细）
+- 专业知识领域（编程、系统管理等）
+- 禁用的功能或行为
+```
+
+---
+
+### 第六步：后台服务安装
+
+
+#### macOS 服务配置
+
+向导自动创建的 LaunchAgent 配置示例：
+
+ ```xml
+ ~/Library/LaunchAgents/com.openclaw.gateway.plist
+
+ <?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+ <plist version="1.0">
+   <dict>
+     <key>Label</key>
+     <string>OpenClaw Gateway</string>
+
+     <key>ProgramArguments</key>
+     <array>
+       <string>gateway</string>
+       <string>--port</string>
+       <string>18789</string>
+     </array>
+
+     <key>RunAtLoad</key>
+     <true/>
+
+     <key>KeepAlive</key>
+     <true/>
+
+     <key>StandardOutPath</key>
+     <string>stdout</string>
+     <key>StandardErrorPath</key>
+     <string>stderr</string>
+   </dict>
+ </plist>
+ ```
+
+#### Linux systemd 配置
+
+向导自动创建的 systemd 配置示例：
+
+```ini
+~/.config/systemd/user/openclaw-gateway.service
+
+[Unit]
+Description=OpenClaw Gateway Service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=%i
+ExecStart=/usr/local/bin/openclaw gateway --port 18789
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+```
+
+---
+
+### 第七步：技能自动安装
+
+
+---
+
+### 第八步：完成与验证
+
+
+---
+
+## 高级选项
+
+### 完全重置配置
+
+如果需要重新开始：
+
+```bash
+openclaw onboard --reset --install-daemon
+```
+
+**警告**：这会删除所有现有配置、会话和技能设置，谨慎使用！
+
+### 跳过向导，手动配置
+
+如果不想使用向导：
+
+```bash
+# 仅安装 CLI，不配置任何内容
+npm install -g openclaw@latest
+
+# 然后手动编辑配置文件
+nano ~/.openclaw/openclaw.json
+```
+
+---
+
+## 故障排查
+
+### 问题：向导卡住或无响应
+
+**可能原因**：
+1. 环境变量冲突（如多个 Node.js 版本）
+2. 缺少必要权限
+3. 网络连接问题（远程配置时）
+
+**解决方案**：
+1. 检查 `openclaw --version` 是否正常
+2. 使用 `--verbose` 标志查看详细日志
+3. 查看配置文件语法错误
+
+### 问题：认证失败
+
+**可能原因**：
+1. API Key 无效或过期
+2. OAuth 回调 URL 配置错误
+3. 网络限制或防火墙阻止
+
+**解决方案**：
+1. 验证 API Key 有效性
+2. 检查网络连接
+3. 查看错误日志：`openclaw logs`
+
+---
+
+## 下一步文档
+
+- [首次连接 - 配对消息通道](./04-首次连接.md) - 连接 WhatsApp、Telegram
+- [常见问题 FAQ](./05-常见问题FAQ.md) - 查看更多问题和解答
+- [Gateway 配置参考](../04-配置与运维/00-配置文件说明.md) - 完整配置选项
+- [macOS 应用](../07-平台指南/01-macOS应用.md) - macOS 专属功能
+
+---
+
+**提示**：完成向导配置后，你可以随时通过 `openclaw configure` 修改配置！
+
+*更多信息请参考 [文档导航](../00-文档导航.md)*
