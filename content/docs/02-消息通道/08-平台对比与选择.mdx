@@ -1,0 +1,348 @@
+---
+title: "平台对比与选择"
+category: "消息通道"
+difficulty: "beginner"
+estimated_time: "15 min"
+tags: ["channels", "comparison", "platforms", "quick-reference"]
+prerequisites:
+  - OpenClaw Gateway 已安装
+related_docs:
+  - "01-WhatsApp连接"
+  - "02-Telegram连接"
+  - "03-Discord连接"
+  - "04-Slack连接"
+  - "05-GoogleChat连接"
+  - "06-iMessage连接"
+  - "07-WebChat连接"
+  - "08-Signal连接"
+next_steps:
+  - "03-核心概念/02-会话模型"
+last_updated: "2026-02-01"
+source: "综合分析各通道文档"
+---
+
+
+# 平台对比与选择指南
+
+<ai-search-key>
+平台对比, 通道选择, WhatsApp, Telegram, Discord, Slack, Google Chat, iMessage, Signal, WebChat, 功能特性, 性能对比, 易用性, 成本, 安全性, 可靠性
+</ai-search-key>
+
+## 通道对比概览
+
+| 通道 | 类型 | 安装难度 | 本地部署 | 多账号 | DM 安全 | 群组支持 | 音频/贴纸 | 反应支持 | 特殊功能 | 最佳用途 |
+|--------|------|----------|----------|---------|-------------|-------------------|----------|------------------|
+| **WhatsApp** | Baileys (网页版) | 中等 | 否 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 个人日常使用 |
+| **Telegram** | Bot API | 简单 | 否 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 丰富机器人功能 |
+| **Discord** | Bot API | 简单 | 否 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 丰富社区互动 |
+| **Slack** | Socket/Webhook | 中等 | 否 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 企业团队协作 |
+| **Google Chat** | Webhook | 简单 | 否 | ✅ | ✅ | ⚠️ | ⚠️ | ⚠️ | Google Workspace 集成 |
+| **iMessage** | imsg CLI | 困难 | ✅ (macOS) | ✅ | ⚠️ | ❌ | ❌ | ❌ | 个人隐私场景 |
+| **WebChat** | Gateway WebSocket | 极简 | ✅ (macOS/iOS) | ✅ | ⚠️ | ❌ | ❌ | ✅ | 快速测试/调试 |
+
+**图例说明**：
+- ✅ 完整支持
+- ⚠️ 部分支持/有限制
+- ❌ 不支持
+
+---
+
+## 快速选择指南
+
+### 场景一：个人日常使用（推荐）
+
+**最推荐**: **WhatsApp** 或 **Telegram**
+
+- **理由**：
+  - 广泛使用，熟悉界面
+  - 端到端稳定
+  - 丰富的功能支持（贴纸、反应、文件传输等）
+  - 配对机制提供良好的 DM 安全性
+  - 官方 SDK，更新及时
+
+**推荐配置**：
+```json5
+{
+  channels: {
+      whatsapp: {
+          dmPolicy: "pairing",
+          allowFrom: ["+15551234567"],
+          groupPolicy: "allowlist",
+        },
+  },
+}
+```
+
+---
+
+### 场景二：企业/团队协作
+
+**推荐**: **Discord** 或 **Slack**
+
+- **理由**：
+  - 原生支持群组和频道
+  - 丰富的集成功能（斜杠命令、线程、贴纸、投票、表情符号等）
+  - 企业级权限管理
+  - 适合团队协作和公开社区
+
+**Discord 优势**：
+- 语音频道支持
+- 原生消息线程化
+- 丰富的角色和权限系统
+- 广泛的社区生态
+
+**Slack 优势**：
+- 深度企业集成
+- 丰富的文件和表情符号生态
+- 专业的工作空间管理
+- 两种部署模式（Socket 和 HTTP webhook）
+
+**注意**: Slack 需要创建应用和配置相对复杂，但适合企业环境。
+
+---
+
+### 场景三：Google Workspace 集成
+
+**推荐**: **Google Chat**
+
+- **理由**：
+  - 原生 Google Workspace 集成
+  - 无需额外应用安装
+  - 适合已有 Google Workspace 的企业
+  - 支持群组空间
+
+**注意事项**：
+- 需要配置 Google Cloud 项目和服务账号
+- Webhook 模式需要公共 HTTPS 端点（推荐使用 Tailscale Funnel）
+
+**快速配置**:
+```json5
+{
+  channels: {
+      googlechat: {
+          enabled: true,
+          serviceAccountFile: "/path/to/service-account.json",
+          audienceType: "app-url",
+          audience: "https://your-domain.com/googlechat",
+        },
+  },
+}
+```
+
+---
+
+### 场景四：macOS 专用个人助手
+
+**推荐**: **iMessage**
+
+- **理由**：
+  - macOS 原生集成，最佳用户体验
+  - 完整的媒体支持
+  - 完美的通知系统
+  - 与 macOS 系统深度集成
+
+**注意事项**：
+- 需要安装 `imsg` CLI 工具
+- 配置相对复杂（需要了解 Messages 应用位置）
+- 仅适用于 macOS 平台
+
+---
+
+### 场景五：快速测试/调试
+
+**推荐**: **WebChat**
+
+- **理由**：
+  - 最简单的设置（仅连接 Gateway）
+  - 适合开发和测试
+  - 无需任何外部 API 密钥
+  - macOS/iOS 原生应用
+
+**优势**：
+- 零配置，开箱即用
+- 与其他通道完全相同的会话和路由
+- 支持消息注入（用于系统通知）
+- 历史记录从 Gateway 获取
+
+---
+
+### 场景六：注重隐私和安全
+
+**推荐**: **Signal** 或 **Telegram**
+
+- **理由**：
+  - 开源，可验证代码
+  - 端到端加密
+  - 支持已读回执和输入指示符
+  - 配对机制
+
+**Signal 特点**：
+- 更强的隐私保护（E2EE 加密）
+- 专业的消息删除功能
+- 支持已读回执（可选）
+- 验证码有效期短（1 小时）
+
+---
+
+### 场景七：机器人开发和高级功能
+
+**推荐**: **Discord** 或 **Telegram**
+
+- **理由**：
+  - 丰富的机器人开发平台
+  - 广泛的 API 文档和社区支持
+  - 支持贴纸、投票、自定义命令、内联按钮等高级功能
+  - 活跃的开发者生态
+
+---
+
+## 关键选择标准
+
+### 安装难度
+
+1. **极简**: WebChat（仅连接 Gateway）
+2. **简单**: Telegram、Discord、Google Chat、Signal（创建 bot，配置 token）
+3. **中等**: Slack（需要应用配置）、WhatsApp（需要二维码扫描）、iMessage（需要 imsg CLI）
+4. **困难**: 需要本地部署（远程 Gateway）
+
+### 成本考量
+
+| 通道类型 | 成本 | 说明 |
+|---------|------|--------|
+| WhatsApp | 免费 | 仅需 WhatsApp 号码 |
+| Telegram | 免费 | Bot token（免费创建） |
+| Discord | 免费 | Bot token（免费创建） |
+| Slack | 免费 | 应用 token + Bot token（免费） |
+| Google Chat | 付费 | 取决于 API 调用量，但 Workspace 基础计划免费 |
+| iMessage | 免费 | 需要 Mac 设备和手机号 |
+| Signal | 免费 | 需要手机号 |
+| WebChat | 免费 | 无额外成本 |
+
+### 功能对比
+
+| 功能 | WhatsApp | Telegram | Discord | Slack | Google Chat | iMessage | Signal | WebChat |
+|--------|---------|---------|---------|---------|---------|---------|---------|---------|---------|
+| **多账号支持** | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| **DM 配对** | ✅ (默认) | ✅ (默认) | ❌ (默认) | ✅ (默认) | ✅ (默认) | ✅ (默认) | ❌ |
+| **群组访问控制** | ✅ | ✅ | ✅ | ✅ | ✅ | ⚠️ (仅 DM) | ❌ | ❌ | ❌ |
+| **已读回执** | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ |
+| **输入指示符** | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ |
+| **消息线程化** | ❌ | ⚠️ (原生支持) | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ |
+| **贴纸支持** | ✅ | ✅ (带缓存) | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **反应** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **斜杠命令** | ❌ | ✅ (原生) | ✅ (原生) | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **文件传输** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⚠️ | ✅ | ✅ | ❌ | ❌ |
+| **投票/投票** | ❌ | ❌ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **表情符号** | ❌ | ⚠️ (基础) | ✅ | ✅ (丰富) | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **媒体限制** | 50MB | 5MB | 8MB | 20MB | 16MB | 8MB | 20MB |
+
+**图例说明**：
+- **最丰富功能**: Discord（15+ 项）、Slack、Telegram
+- **性能优化**: Signal、WhatsApp（消息分块、草稿流）
+- **最简单**: WebChat（仅 UI，无外部依赖）
+- **企业级**: Slack、Google Chat
+
+---
+
+## 使用建议
+
+### 推荐组合
+
+1. **主通道**: WhatsApp 或 Telegram（个人使用）
+   - 用于日常对话和快速任务
+   
+2. **协作通道**: Discord 或 Slack（团队使用）
+   - 用于群组协作和社区互动
+   
+3. **辅助通道**: iMessage（macOS 个人使用）或 WebChat（测试/调试）
+   - iMessage 用于个人隐私场景
+   - WebChat 用于开发和快速验证
+
+### 通道切换
+
+OpenClaw 支持**同时连接多个通道**！你可以在不同会话中使用不同的通道，无需重启。
+
+**示例场景**：
+- **多设备工作**：在电脑上使用 WebChat，在手机上使用 WhatsApp
+- **跨平台协作**：通过 Discord 与团队协作，通过 WhatsApp 处理个人消息
+- **测试环境**：使用 WebChat 快速测试配置，然后切换到生产通道
+
+---
+
+## 配置迁移
+
+如果你想从一个通道迁移到另一个：
+
+### 从 WhatsApp 迁移到 Telegram
+
+1. **禁用 WhatsApp**:
+   ```json5
+   {
+      channels: {
+          whatsapp: { enabled: false },
+      },
+   }
+   ```
+
+2. **配置 Telegram**（如果之前未配置）:
+   ```json5
+   {
+      channels: {
+          telegram: {
+                      enabled: true,
+                      botToken: "YOUR_BOT_TOKEN",
+                      dmPolicy: "pairing",
+                    },
+                },
+   }
+   ```
+
+3. **重启 Gateway**:
+   ```bash
+   openclaw gateway restart
+   ```
+
+4. **批准新的配对**:
+   ```bash
+   openclaw pairing approve telegram <CODE>
+   ```
+
+---
+
+## 故障排查快速参考
+
+| 问题 | 常见通道 | 解决方案 |
+|------|----------|----------|
+| **消息未到达** | 检查 `openclaw channels status --probe` <br/> 验证 token 和网络连接 |
+| **配对码过期** | 重新发起配对流程 <br/> 配对码 1 小时有效 |
+| **文件大小限制** | 调整 `channels.*.mediaMaxMb` 配置 |
+| **群组无法响应** | 检查 `requireMention` 和权限设置 <br/> 确认 bot 有管理员/成员权限 |
+| **Rate Limit 错误** | 增加重试间隔或降低请求频率 |
+
+---
+
+## 推荐链接
+
+详细的通道配置指南：
+- [WhatsApp 连接配置](./01-WhatsApp连接)
+- [Telegram 连接配置](./02-Telegram连接)
+- [Discord 连接配置](./03-Discord连接)
+- [Slack 连接配置](./04-Slack连接)
+- [Google Chat 连接配置](./05-GoogleChat连接)
+- [iMessage 连接配置](./06-iMessage连接)
+- [WebChat 连接配置](./07-WebChat连接)
+- [Signal 连接配置](./08-Signal连接)
+
+---
+
+## 总结
+
+选择合适的通道取决于你的具体需求：
+
+- **日常使用** → WhatsApp、Telegram
+- **团队协作** → Discord、Slack
+- **企业集成** → Google Chat
+- **个人隐私** → iMessage、Signal
+- **快速测试** → WebChat
+
+**建议**：初次使用者从 **WhatsApp** 或 **Telegram** 开始，根据需要逐步添加其他通道。

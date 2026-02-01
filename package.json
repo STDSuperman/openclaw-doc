@@ -1,15 +1,32 @@
 {
-  "name": "openclaw-docs",
-  "version": "1.0.0",
+  "name": "my-app",
+  "version": "0.0.0",
   "private": true,
-  "type": "module",
   "scripts": {
-    "dev": "vitepress dev docs",
-    "build": "vitepress build docs",
-    "preview": "vitepress preview docs"
+    "build": "next build",
+    "dev": "next dev",
+    "start": "next start",
+    "types:check": "fumadocs-mdx && next typegen && tsc --noEmit",
+    "postinstall": "fumadocs-mdx"
+  },
+  "dependencies": {
+    "fumadocs-core": "16.5.0",
+    "fumadocs-mdx": "14.2.6",
+    "fumadocs-ui": "16.5.0",
+    "lucide-react": "^0.563.0",
+    "next": "16.1.6",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {
-    "vitepress": "^1.0.0",
-    "vitepress-plugin-llms": "^1.0.0"
+    "@tailwindcss/postcss": "^4.1.18",
+    "@types/mdx": "^2.0.13",
+    "@types/node": "^25.1.0",
+    "@types/react": "^19.2.10",
+    "@types/react-dom": "^19.2.3",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.18",
+    "typescript": "^5.9.3"
   }
 }

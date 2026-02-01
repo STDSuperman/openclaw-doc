@@ -1,0 +1,141 @@
+---
+title: "AI 模型选择与优化"
+category: "AI模型"
+difficulty: "intermediate"
+estimated_time: "15 min"
+tags: ["模型", "选择", "优化", "failover", "token管理"]
+prerequisites: ["快速开始"]
+related_docs: ["模型故障排查"]
+next_steps: ["模型故障排查"]
+last_updated: "2026-01-01"
+source: "docs/concepts/model-failover.md"
+---
+
+
+# AI 模型选择与优化
+
+## 模型故障转移
+
+OpenClaw 分两个阶段处理故障:
+
+1. **认证配置文件轮换**: 在当前提供商的认证配置文件内
+2. **模型故障转移**: 转移到 `agents.defaults.model.fallbacks` 中的下一个模型
+
+## 认证存储(密钥 + OAuth)
+
+OpenClaw 对两种认证类型使用 **认证配置文件**:
+
+- API 密钥: `{ "type": "api_key", "provider": "openai", "key": "..." }`
+- OAuth 令牌: `{ "type": "oauth", "provider": "anthropic", "access": "...", "refresh": "...", "expires": "...", "email": "...", "projectId": "...", "enterpriseUrl": "..." }`
+
+密钥和令牌存储在:
+- `~/.openclaw/agents/<agentId>/agent/auth-profiles.json`(新)
+- `~/.openclaw/agent/auth-profiles.json`(遗留,自动导入到新位置)
+
+更多信息: [/概念/oauth](/03-核心概念/02-会话模型#oauth)
+
+## 配置文件 ID
+
+OAuth 登录创建不同的配置文件 ID,以便多个账户可以共存:
+- 默认: `provider:default`(当没有电子邮件时)
+- 带有电子邮件: `provider:<email>`
+
+示例:
+- `anthropic:default`
+- `google:antigravity:user@gmail.com`
+
+## 轮换顺序
+
+当提供商有多个认证配置文件时,OpenClaw 选择顺序:
+
+1. **显式配置顺序**: `auth.order[provider]`(如果设置)
+2. **已配置的认证配置文件**: 按 `auth.profiles` 筛选(仅包含提供商的条目)
+3. **回退到默认**: 未排序的默认配置文件最后
+4. **按到期时间排序**: 冷却/禁用/已用的配置文件移到末尾
+
+### 回退链
+
+`agents.defaults.model.fallbacks` 定义故障转移链。每个条目可以指定:
+- 模型选择器(按提供商或别名)
+- 提供商列表
+- 策略(`round-robin`、`cooldown`、`usage-stats`)
+
+### 会话固定(缓存友好)
+
+OpenClaw **固定每个会话到一个认证配置文件**以保持提供商缓存热:
+- 当会话启动时选择一个配置文件
+- 在故障转移时切换到新配置文件
+- 这避免了请求间的切换,提高了缓存效率
+
+### 故障转移触发
+
+当当前模型遇到以下情况时触发故障转移:
+- 速率限制(429)
+- 超时
+- 服务器错误(5xx)
+- 配额耗尽
+- 权限错误(401/403)
+
+### 故障转移行为
+
+- 在当前提供商内尝试其他认证配置文件
+- 如果全部失败,切换到下一个提供商
+- 提供商之间的故障转移顺序取决于 `fallbacks` 配置
+
+## 使用统计(最后使用优先)
+
+每个提供商跟踪使用统计以实现智能故障转移:
+
+- `usageStats.lastUsed`: 最后使用的认证配置文件
+- 同一提供商内的多个配置文件按最近使用排序
+
+## 会话覆盖(用户固定)
+
+用户可以通过斜杠命令固定会话到特定的认证配置文件:
+- `/model …@<profileId>` - 设置用户覆盖
+- `/model <provider>` - 按提供商选择
+
+## 冷却与禁用
+
+OpenClaw 可以对认证配置文件设置状态:
+- **冷却**: 等待一段时间后重试
+- **禁用**: 暂时从轮换中移除
+
+冷却时间配置:
+- `auth.cooldownMs`: 距离上次使用后的冷却时间(毫秒)
+
+冷却的配置文件在冷却/禁用后移到末尾,排序靠后。
+
+## 示例配置
+
+```json5
+{
+  auth: {
+    order: ["anthropic", "openai", "google", "openrouter"],
+    profiles: {
+      "anthropic:default": { type: "oauth" },
+      "google:antigravity:user@gmail.com": { type: "oauth", email: "..." },
+    },
+    cooldownMs: 60000,  // 1分钟
+  },
+  agents: {
+    defaults: {
+      model: {
+        fallbacks: [
+          { selector: "anthropic", models: ["claude-opus-4-5", "claude-3-5-sonnet"], strategy: "round-robin" },
+          { selector: "openai", models: ["gpt-4o", "gpt-4o-mini"], strategy: "round-robin" },
+        ],
+      },
+    },
+  },
+}
+```
+
+## 最佳实践
+
+- 为每个提供商配置多个认证配置文件以提高可用性
+- 使用有意义的配置文件 ID(例如 `anthropic:default`)
+- 测试故障转移链以确保工作正常
+- 为高优先级任务使用特定提供商
+- 监控使用统计以优化缓存
+- 使用冷却以避免快速故障转移

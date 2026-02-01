@@ -1,0 +1,95 @@
+---
+title: "自动化任务概览"
+category: "自动化任务"
+difficulty: "intermediate"
+estimated_time: "15 min"
+tags: ["自动化", "心跳", "定时任务", "cron"]
+prerequisites: ["快速开始", "基础使用"]
+related_docs: ["定时任务", "Webhooks", "Gmail推送"]
+next_steps: ["定时任务", "Webhooks"]
+last_updated: "2026-01-01"
+source: "docs/automation/cron-vs-heartbeat.md, docs/automation/auth-monitoring.md"
+---
+
+
+# 自动化任务概览
+
+<ai-search-key>
+自动化任务, 心跳, 定时任务, Cron, Webhook, OAuth监控, 任务调度
+</ai-search-key>
+
+OpenClaw 提供了多种自动化任务机制,帮助你构建智能的个人助手系统。不同的自动化方式适用于不同的场景,了解它们的特点和最佳实践能帮助你做出正确的选择。
+
+## 自动化任务类型一览
+
+| 机制 | 适用场景 | 特点 |
+|--------|-----------|--------|
+| **心跳(Heartbeat)** | 周期性检查、监控 | 批量处理、上下文感知、节省API调用 |
+| **定时任务(Cron)** | 精确时间调度 | 独立运行、模型灵活、可隔离会话 |
+| **Webhook** | 外部系统集成 | 实时触发、灵活配置、支持多种映射 |
+| **Gmail推送** | 邮件实时通知 | Pub/Sub集成、自动同步、即时响应 |
+| **认证监控** | OAuth凭证管理 | 过期预警、自动刷新、运维友好 |
+
+## 快速决策指南
+
+如果你不确定该使用哪种自动化方式,参考下面的决策流程:
+
+```
+任务需要精确的时间执行吗?
+  是 -> 使用 Cron 定时任务
+  否  -> 继续...
+
+任务需要与主会话隔离吗?
+  是 -> 使用 Cron (隔离模式)
+  否  -> 继续...
+
+任务可以和其他周期性检查一起批量处理吗?
+  是 -> 使用 心跳(Heartbeat)
+  否  -> 继续...
+
+任务是否是一次性提醒?
+  是 -> 使用 Cron (配合 --at 参数)
+  否  -> 继续...
+
+任务需要不同的模型或思考级别吗?
+  是 -> 使用 Cron (隔离模式 + 模型覆盖)
+  否  -> 使用 心跳
+```
+
+## 下一章
+
+- [定时任务](/05-自动化任务/02-定时任务) - Cron 任务的详细配置和使用
+- [Webhooks](/05-自动化任务/03-Webhooks) - Webhook 配置和外部集成
+- [Gmail推送](/05-自动化任务/04-Gmail推送) - Gmail Pub/Sub 设置和实时通知
+
+## 认证监控
+
+OpenClaw 提供了 OAuth 过期健康检查功能,可通过 `openclaw models status` 命令使用,这对于自动化和告警非常有用。
+
+### CLI 检查(推荐,可移植)
+
+```bash
+openclaw models status --check
+```
+
+**退出码**:
+- `0`: 正常
+- `1`: 凭证过期或缺失
+- `2`: 即将过期(24小时内)
+
+这种方法适用于 cron/systemd 定时器,无需额外的脚本。
+
+### 可选脚本(运维/手机工作流)
+
+这些脚本位于 `scripts/` 目录下,是**可选的**。它们假设你通过 SSH 访问网关主机,并针对 systemd + Termux 进行了优化:
+
+- `scripts/claude-auth-status.sh` - 使用 `openclaw models status --json` 作为事实源(如果 CLI 不可用则回退到直接文件读取),所以让 `openclaw` 在 `PATH` 中以供定时器使用
+- `scripts/auth-monitor.sh` - cron/systemd 定时器目标;发送告警(ntfy 或手机)
+- `scripts/systemd/openclaw-auth-monitor.{service,timer}` - systemd 用户定时器
+- `scripts/claude-auth-status.sh` - Claude Code + OpenClaw 认证检查器(完整/JSON/简单模式)
+- `scripts/mobile-reauth.sh` - 通过 SSH 的引导式重新认证流程
+- `scripts/termux-quick-auth.sh` - 一键式小部件状态 + 打开认证 URL
+- `scripts/termux-auth-widget.sh` - 完整引导式小部件流程
+- `scripts/termux-sync-widget.sh` - 同步 Claude Code 凭证到 OpenClaw
+
+如果你不需要手机自动化或 systemd 定时器,可以跳过这些脚本。

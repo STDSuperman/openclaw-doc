@@ -1,0 +1,351 @@
+---
+title: "日志与监控"
+category: "配置与运维"
+difficulty: "进阶"
+estimated_time: "15分钟阅读"
+tags:
+  - 日志
+  - 监控
+  - 日志轮转
+  - 日志清理
+  - 性能指标
+prerequisites:
+  - "[已完成安装](../00-快速开始/02-5分钟安装指南.md)"
+  - "[已完成配置](../00-快速开始/03-向导式配置.md)"
+related_docs:
+  - ["Gateway运维", "安全配置"]
+next_steps:
+  - ["故障排查"]
+last_updated: "2026-02-01"
+source: "docs/gateway/logging.md"
+---
+
+# 日志与监控
+
+> **TL;DR**: 通过日志和监控工具追踪 Gateway 运行状态，快速定位和解决问题。
+
+
+## 日志系统概览
+
+### 日志文件位置
+
+```
+主目录: ~/.openclaw/logs/
+
+主要日志文件:
+  ├─ gateway.log          # Gateway 主日志（所有操作）
+  ├─ agent.log             # Agent 执行日志
+  ├─ channels.log           # 通道连接日志
+  ├─ error.log             # 错误日志（汇总）
+  ├─ debug.log             # 调试日志
+  └─ request.log            # 请求日志
+
+结构化日志（如果启用）:
+  ├─ gateway-structured.log  # 结构化 Gateway 日志
+  ├─ agent-structured.log   # 结构化 Agent 日志
+  └─ metrics.log           # 性能指标日志
+```
+
+---
+
+## 查看日志
+
+### 基础查看
+
+```bash
+# 查看最近 50 行
+openclaw logs --tail 50
+
+# 查看特定模块日志
+openclaw logs --module gateway
+openclaw logs --module channels
+openclaw logs --module agent
+
+# 查看错误日志
+openclaw logs --level error
+```
+
+### 过滤日志
+
+```bash
+# 按时间过滤
+openclaw logs --since "2026-02-01T00:00:00"
+
+# 只看今天
+openclaw logs --today
+
+# 按会话过滤
+openclaw logs --session "agent:main:whatsapp:dm:+86999999900"
+
+# 按关键词搜索
+openclaw logs | grep "error" | head -n 20
+
+# 组合过滤
+openclaw logs --module gateway --level warning | grep "timeout"
+```
+
+---
+
+## 日志配置
+
+### 日志级别
+
+| 级别 | 说明 | 用途 | 示例 |
+|------|------|------|------|
+| `error` | 错误日志 | 严重问题 | `Connection failed`、`API error` |
+| `warning` | 警告日志 | 潜在问题 | `Config validation failed`、`Retrying connection` |
+| `info` | 信息日志 | 正常操作 | `Gateway started`、`Message sent` |
+| `debug` | 调试日志 | 开发调试 | `Function called`、`Returning value` |
+
+### 日志格式
+
+**JSON 格式**（结构化日志）：
+
+```json
+{
+  "timestamp": "2026-02-01T10:30:00.123Z",
+  "level": "info",
+  "module": "gateway",
+  "message": "Gateway started",
+  "context": {
+    "port": 18789,
+    "bind": "loopback"
+  }
+}
+```
+
+**纯文本格式**（标准日志）：
+
+```
+[2026-02-01T10:30:00.123Z] INFO [gateway] Gateway started
+[2026-02-01T10:30:01.456Z] INFO [channels] WhatsApp connected
+[2026-02-01T10:30:02.123Z] ERROR [gateway] Connection timeout
+```
+
+---
+
+## 日志轮转
+
+### 配置日志轮转
+
+```bash
+# 启用日志轮转
+openclaw config set logging.rotate.enabled true
+
+# 设置单文件最大 10MB
+openclaw config set logging.rotate.maxSize 10485760
+
+# 保留最近 10 个日志文件
+openclaw config set logging.rotate.maxFiles 10
+```
+
+### 手动触发轮转
+
+```bash
+# 立即轮转
+openclaw logs rotate
+
+# 压缩旧日志
+openclaw logs rotate --compress
+```
+
+**轮转策略**：
+- 1. 当日志文件超过 `maxSize` 时触发
+- 2. 压缩旧日志节省空间
+- 3. 文件名包含时间戳
+- 4. 保留最近 N 个文件
+
+---
+
+## 日志清理
+
+### 自动清理
+
+```bash
+# 删除 30 天前的日志
+openclaw logs prune --days 30
+
+# 删除所有日志（危险操作）
+openclaw logs clear
+```
+
+### 清理策略
+
+| 策略 | 保留天数 | 适用场景 |
+|------|----------|----------|
+| **生产环境** | 30 天 | 平衡空间和需求 |
+| **开发环境** | 7 天 | 频繁开发需要 |
+| **调试环境** | 3 天 | 快速迭代 |
+
+---
+
+## 性能监控
+
+### 性能指标
+
+| 指标 | 说明 | 监控方式 |
+|------|------|----------|
+| **响应时间** | `agent.response_time` | 平均响应时间 |
+| **内存使用** | `memory_usage` | 进程内存占用 |
+| **连接数** | `connection_count` | 活跃 WebSocket 连接 |
+| **消息处理** | `messages_processed` | 每秒处理消息数 |
+| **错误率** | `error_rate` | 错误请求比例 |
+
+### 查看性能
+
+```bash
+# 查看当前性能指标
+openclaw metrics
+
+# 查看特定模块性能
+openclaw metrics --module gateway
+openclaw metrics --module channels
+```
+
+**输出示例**：
+```
+性能报告 (2026-02-01 12:00:00):
+
+📊 Gateway 性能:
+  ├─ 运行时间: 5h 30m
+  ├─ 活跃连接: 2
+  ├─ 平均响应时间: 850ms
+  ├─ P95 响应时间: 3.2s
+  ├─ 错误率: 0.5%
+  └─ 消息处理: 1,234 msg/h
+
+📊 内存使用:
+  ├─ 当前: 245MB / 512MB (47.7%)
+  └─ 峰值: 312MB / 512MB (60.9%)
+```
+
+---
+
+## 监控脚本
+
+### 简单监控
+
+```bash
+#!/bin/bash
+
+# simple-monitor.sh - 简单监控脚本
+
+while true; do
+  # 获取 Gateway 状态
+  STATUS=$(openclaw gateway status 2>&1)
+  
+  # 提取关键信息
+  UPTIME=$(echo "$STATUS" | grep -o "运行时间:.*" | cut -d: -f2)
+  SESSIONS=$(echo "$STATUS" | grep -o "活跃:.*" | cut -d: -f2)
+  
+  # 显示状态
+  echo "[$(date)] 📊 监控报告"
+  echo "运行时间: $UPTIME"
+  echo "活跃会话: $SESSIONS"
+  echo "--------------------------------"
+  
+  sleep 60
+done
+```
+
+### 高级监控（带性能分析）
+
+```bash
+#!/bin/bash
+
+# advanced-monitor.sh - 高级监控脚本
+
+# 配置
+LOG_FILE="/var/log/openclaw-monitor.log"
+ALERT_EMAIL="admin@example.com"
+THRESHOLD_MB=300  # 超过 300MB 时告警
+
+while true; do
+  # 获取状态和性能指标
+  REPORT=$(openclaw health --format json)
+  MEMORY=$(echo "$REPORT" | grep -o "内存使用:.*" | cut -d: -f2 | sed 's/MB//')
+  
+  RESPONSE=$(echo "$REPORT" | grep -o "平均响应时间:.*" | cut -d: -f2 | sed 's/ms//')
+  ERRORS=$(echo "$REPORT" | grep -o "错误率:.*" | cut -d: -f2 | sed 's/%//')
+  
+  CONNECTIONS=$(echo "$REPORT" | grep -o "活跃连接:.*" | cut -d -f2)
+  
+  # 检查告警条件
+  MEMORY_VAL=$(echo $MEMORY | tr -d '[:alpha:].')
+  ERRORS_VAL=$(echo $ERRORS | tr -d '[:alpha:].')
+  CONNECTIONS_VAL=$(echo $CONNECTIONS | tr -d '[:alpha:].')
+  
+  # 判断是否发送告警
+  if [ "$MEMORY_VAL" -gt "$THRESHOLD_MB" ] || [ "$ERRORS_VAL" -gt "10" ]; then
+    echo "[$(date)] ⚠️ 性能告警：内存 $MEMORY_VAL%，错误率 $ERRORS%"
+    echo "$REPORT" >> "$LOG_FILE"
+    # 发送邮件（需要配置邮件发送工具）
+    # echo "Performance alert: Memory $MEMORY%, Error rate $ERRORS%" | mail -s "Performance Alert" $ALERT_EMAIL <<< "Gateway performance issue"
+  fi
+  
+  sleep 60
+done
+```
+
+---
+
+## 日志分析
+
+### 搜索特定错误模式
+
+```bash
+# 查看最近的所有连接失败
+openclaw logs --since "1 day ago" | grep -i "Connection timeout"
+
+# 统计错误出现频率
+openclaw logs --since "1 week ago" | grep -c "error" | awk '{print $1}'
+
+# 查看特定模块的错误
+openclaw logs --module channels | grep -c "error" | sort | uniq -c
+```
+
+### 统计分析
+
+```bash
+# 错误统计
+ERROR_COUNT=$(openclaw logs --since "24 hours" | grep -c "ERROR" | wc -l)
+echo "过去 24 小时错误数: $ERROR_COUNT"
+
+# 热门错误
+GATEWAY_ERRORS=$(openclaw logs --module gateway | grep -c "ERROR" | grep "gateway")
+echo "Gateway 错误: $GATEWAY_ERRORS"
+
+# Agent 错误
+AGENT_ERRORS=$(openclaw logs --module agent | grep -c "ERROR" | grep "agent")
+echo "Agent 错误: $AGENT_ERRORS"
+
+# 通道错误
+for channel in whatsapp telegram discord; do
+  CHANNEL_ERRORS=$(openclaw logs --module channels | grep -c "ERROR" | grep -i "$channel")
+  echo "$channel 错误: $CHANNEL_ERRORS"
+done
+```
+
+---
+
+## 下一步文档
+
+- [故障排查](./09-故障排查.md) - 使用日志诊断问题
+- [Gateway 运维](./03-Gateway运维.md) - 学习服务管理
+- [安全配置](./06-安全配置.md) - 了解安全最佳实践
+
+---
+
+<ai-search-key>
+日志, 监控, 日志轮转, 日志清理, 性能指标, 响应时间, 内存使用, 错误率, 活跃连接, 消息处理, 性能告警, 监控脚本, 高级监控, 日志分析, 错误统计, 日志格式, 结构化日志, 日志级别, 错误日志, 警告日志, 信息日志, 调试日志, 日志配置, 清理策略, 保留策略, 性能监控指标, 监控脚本, 性能报告, 告警机制, 邮件模式, 日志搜索, 错误统计
+</ai-search-key>
+
+**日志与监控要点总结**：
+- 📝 **日志系统**：主目录 5 个日志文件，支持过滤和搜索
+- 🔄 **日志轮转**：自动轮转、压缩、清理旧日志
+- 📊 **性能监控**：实时指标收集、性能报告
+- 🔧 **监控脚本**：简单和高级监控脚本示例
+- 🔍 **日志分析**：错误统计、模式搜索、频率分析
+- ⚠️ **告警机制**：内存超时、错误率异常时自动告警
+
+*更多信息请参考 [文档导航](../00-文档导航.md)*
