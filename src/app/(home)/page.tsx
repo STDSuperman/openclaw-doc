@@ -3,7 +3,18 @@ import { ArrowRight } from 'lucide-react';
 
 export default function HomePage() {
   return (
-    <div className="flex flex-col items-center justify-center flex-1 px-4 py-16 max-w-4xl mx-auto">
+    <>
+      <div className="hero-bg fixed inset-0 -z-10">
+        <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="grid" width="80" height="80" patternUnits="userSpaceOnUse">
+              <path d="M 80 0 L 0 0 0 80" fill="none" stroke="var(--grid-line)" strokeWidth="1"/>
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#grid)" />
+        </svg>
+      </div>
+      <div className="flex flex-col items-center justify-center flex-1 px-4 py-16 max-w-4xl mx-auto">
       <div className="text-center mb-12">
         <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
           OpenClaw 中文文档
@@ -58,13 +69,8 @@ export default function HomePage() {
           快速开始
           <ArrowRight size={16} />
         </Link>
-        <Link
-          href="/docs/00-文档导航"
-          className="inline-flex items-center gap-2 px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium"
-        >
-          在线文档
-        </Link>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

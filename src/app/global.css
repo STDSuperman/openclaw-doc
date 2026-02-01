@@ -1,3 +1,110 @@
 @import 'tailwindcss';
 @import 'fumadocs-ui/css/neutral.css';
 @import 'fumadocs-ui/css/preset.css';
+
+:root {
+  /* 白色主题变量 */
+  --grid-line: rgba(0, 0, 0, 0.06);
+  --bg-color: #ffffff;
+}
+
+/* 暗黑主题变量 */
+.dark {
+  --grid-line: rgba(255, 255, 255, 0.15);
+  --bg-color: #0f172a;
+}
+
+.hero-bg {
+  background-color: var(--bg-color) !important;
+  transition: background 0.3s, stroke 0.3s;
+}
+
+/* 确保主布局容器背景透明，让网格可见 */
+main#nd-home-layout {
+  background: transparent !important;
+}
+
+/* 确保内容容器背景透明 */
+#nd-home-layout > div {
+  background: transparent !important;
+}
+
+/* 卡牌样式 - 毛玻璃效果 */
+.grid > div {
+  background: rgba(255, 255, 255, 0.3) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.05),
+    0 2px 4px -2px rgba(0, 0, 0, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
+  transition: all 0.3s ease;
+}
+
+/* 卡牌悬停效果 */
+.grid > div:hover {
+  background: rgba(255, 255, 255, 0.5) !important;
+  transform: translateY(-2px);
+  box-shadow:
+    0 8px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -4px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6) !important;
+  border-color: rgba(59, 130, 246, 0.3) !important;
+}
+
+/* 卡牌文字颜色适配 */
+.grid > div h3,
+.grid > div p {
+  color: #0f172a !important;
+}
+
+/* 暗黑模式下的卡牌 */
+html.dark .grid > div,
+body.dark .grid > div {
+  background: rgba(30, 41, 59, 0.3) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.3),
+    0 2px 4px -2px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+/* 暗黑模式卡牌悬停 */
+html.dark .grid > div:hover,
+body.dark .grid > div:hover {
+  background: rgba(30, 41, 59, 0.5) !important;
+  border-color: rgba(59, 130, 246, 0.4) !important;
+  box-shadow:
+    0 8px 15px -3px rgba(0, 0, 0, 0.4),
+    0 4px 6px -4px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+}
+
+/* 暗黑模式卡牌文字 */
+html.dark .grid > div h3,
+html.dark .grid > div p,
+body.dark .grid > div h3,
+body.dark .grid > div p {
+  color: #e2e8f0 !important;
+}
+
+/* 暗黑模式主标题文字适配 */
+html.dark .text-gray-600,
+html.dark .text-gray-500,
+body.dark .text-gray-600,
+body.dark .text-gray-500 {
+  color: #94a3b8 !important;
+}
+
+/* 暗黑模式按钮适配 */
+html.dark a[href="/docs/00-文档导航"],
+body.dark a[href="/docs/00-文档导航"] {
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  color: #e2e8f0 !important;
+}
+
+html.dark a[href="/docs/00-文档导航"]:hover,
+body.dark a[href="/docs/00-文档导航"]:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
